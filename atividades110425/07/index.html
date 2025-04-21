@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classificador de Senha</title>
+    <style>
+        .weak {
+            color: red;
+        }
+        .medium {
+            color: orange;
+        }
+        .strong {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Classificador de Senha</h1>
+    <label for="password">Senha:</label>
+    <input type="password" id="password" oninput="classifyPassword()">
+    <div id="strength"></div>
+
+    <script src="07.js"></script>
+</body>
+</html>
