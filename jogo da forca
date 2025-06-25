@@ -1,150 +1,210 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jogo da Velha</title>
+  <meta charset="UTF-8">
+  <title>Jogo da Forca</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f0f0f0;
-      padding: 40px;
+      background-color: #f8f8f8;
+      padding: 30px;
     }
 
     h1 {
       margin-bottom: 20px;
     }
 
-    #tabuleiro {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 5px;
-      justify-content: center;
+    #palavra {
+      font-size: 2em;
+      letter-spacing: 10px;
       margin-bottom: 20px;
     }
 
-    .celula {
-      width: 100px;
-      height: 100px;
-      background-color: white;
-      border: 2px solid #444;
-      font-size: 2em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    #letras {
+      margin: 20px;
+    }
+
+    .letra-btn {
+      padding: 10px;
+      margin: 3px;
+      font-size: 18px;
       cursor: pointer;
     }
 
-    .celula:hover {
-      background-color: #e0e0e0;
+    .letra-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
 
     #mensagem {
       font-size: 1.2em;
-      margin-bottom: 10px;
+      margin-top: 20px;
+      font-weight: bold;
     }
 
-    button {
+    #boneco {
+      width: 120px;
+      height: 180px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .parte {
+      display: none;
+      position: absolute;
+      background-color: black;
+    }
+
+    #cabeca {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      top: 0;
+      left: 45px;
+    }
+
+    #tronco {
+      width: 10px;
+      height: 50px;
+      top: 30px;
+      left: 55px;
+    }
+
+    #bracoE {
+      width: 40px;
+      height: 5px;
+      top: 40px;
+      left: 15px;
+      transform: rotate(30deg);
+      transform-origin: right;
+    }
+
+    #bracoD {
+      width: 40px;
+      height: 5px;
+      top: 40px;
+      left: 65px;
+      transform: rotate(-30deg);
+      transform-origin: left;
+    }
+
+    #pernaE {
+      width: 40px;
+      height: 5px;
+      top: 80px;
+      left: 15px;
+      transform: rotate(-30deg);
+      transform-origin: right;
+    }
+
+    #pernaD {
+      width: 40px;
+      height: 5px;
+      top: 80px;
+      left: 65px;
+      transform: rotate(30deg);
+      transform-origin: left;
+    }
+
+    button#reiniciar {
+      margin-top: 20px;
       padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Jogo da Velha</h1>
-  <div id="mensagem">Sua vez!</div>
-  <div id="tabuleiro"></div>
-  <button onclick="reiniciarJogo()">Reiniciar</button>
+  <h1>Jogo da Forca</h1>
+
+  <div id="boneco">
+    <div id="cabeca" class="parte"></div>
+    <div id="tronco" class="parte"></div>
+    <div id="bracoE" class="parte"></div>
+    <div id="bracoD" class="parte"></div>
+    <div id="pernaE" class="parte"></div>
+    <div id="pernaD" class="parte"></div>
+  </div>
+
+  <div id="palavra"></div>
+  <div id="letras"></div>
+  <div id="mensagem"></div>
+  <button id="reiniciar" onclick="iniciarJogo()">Reiniciar</button>
 
   <script>
-    const tabuleiro = document.getElementById("tabuleiro");
-    const mensagem = document.getElementById("mensagem");
+    const palavras = ["GUILHERME", "DIOGO", "MIGUEL", "MARQUES", "PIETRO"];
+    const maxErros = 5;
+    let palavraSorteada = "";
+    let letrasCorretas = [];
+    let erros = 0;
 
-    let tab = ["", "", "", "", "", "", "", "", ""];
-    let fimDeJogo = false;
-
-    function criarTabuleiro() {
-      tabuleiro.innerHTML = "";
-      tab.forEach((valor, i) => {
-        const celula = document.createElement("div");
-        celula.classList.add("celula");
-        celula.textContent = valor;
-        celula.addEventListener("click", () => jogar(i));
-        tabuleiro.appendChild(celula);
-      });
+    function iniciarJogo() {
+      palavraSorteada = palavras[Math.floor(Math.random() * palavras.length)];
+      letrasCorretas = [];
+      erros = 0;
+      document.getElementById("mensagem").textContent = "";
+      document.querySelectorAll(".parte").forEach(parte => parte.style.display = "none");
+      mostrarPalavra();
+      criarBotoes();
     }
 
-    function jogar(indice) {
-      if (fimDeJogo || tab[indice] !== "") return;
-
-      tab[indice] = "X";
-      atualizar();
-      if (verificarVitoria("X")) return;
-
-      setTimeout(jogadaComputador, 500);
+    function mostrarPalavra() {
+      const display = palavraSorteada.split("").map(letra =>
+        letrasCorretas.includes(letra) ? letra : "_"
+      ).join(" ");
+      document.getElementById("palavra").textContent = display;
     }
 
-    function jogadaComputador() {
-      if (fimDeJogo) return;
-
-      let posicoesVazias = tab
-        .map((val, i) => val === "" ? i : null)
-        .filter(i => i !== null);
-
-      if (posicoesVazias.length === 0) return;
-
-      let escolha = posicoesVazias[Math.floor(Math.random() * posicoesVazias.length)];
-      tab[escolha] = "O";
-      atualizar();
-      verificarVitoria("O");
+    function criarBotoes() {
+      const container = document.getElementById("letras");
+      container.innerHTML = "";
+      for (let i = 65; i <= 90; i++) {
+        const letra = String.fromCharCode(i);
+        const btn = document.createElement("button");
+        btn.textContent = letra;
+        btn.className = "letra-btn";
+        btn.onclick = () => testarLetra(letra, btn);
+        container.appendChild(btn);
+      }
     }
 
-    function verificarVitoria(jogador) {
-      const combinacoes = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-      ];
-
-      for (let combinacao of combinacoes) {
-        const [a, b, c] = combinacao;
-        if (tab[a] === jogador && tab[b] === jogador && tab[c] === jogador) {
-          mensagem.textContent = (jogador === "X" ? "Você venceu!" : "Computador venceu!");
-          fimDeJogo = true;
-          return true;
+    function testarLetra(letra, botao) {
+      botao.disabled = true;
+      if (palavraSorteada.includes(letra)) {
+        letrasCorretas.push(letra);
+        mostrarPalavra();
+        verificarVitoria();
+      } else {
+        erros++;
+        mostrarParteDoBoneco(erros);
+        if (erros >= maxErros) {
+          document.getElementById("mensagem").textContent = "Você perdeu! A palavra era: " + palavraSorteada;
+          desativarBotoes();
         }
       }
+    }
 
-      if (!tab.includes("")) {
-        mensagem.textContent = "Empate!";
-        fimDeJogo = true;
-        return true;
+    function mostrarParteDoBoneco(erro) {
+      const partes = ["cabeca", "tronco", "bracoE", "bracoD", "pernaE", "pernaD"];
+      if (erro <= partes.length) {
+        document.getElementById(partes[erro - 1]).style.display = "block";
       }
-
-      mensagem.textContent = (jogador === "X") ? "Vez do computador..." : "Sua vez!";
-      return false;
     }
 
-    function atualizar() {
-      criarTabuleiro();
+    function verificarVitoria() {
+      const ganhou = palavraSorteada.split("").every(letra => letrasCorretas.includes(letra));
+      if (ganhou) {
+        document.getElementById("mensagem").textContent = "Parabéns, você venceu!";
+        desativarBotoes();
+      }
     }
 
-    function reiniciarJogo() {
-      tab = ["", "", "", "", "", "", "", "", ""];
-      fimDeJogo = false;
-      mensagem.textContent = "Sua vez!";
-      atualizar();
+    function desativarBotoes() {
+      document.querySelectorAll(".letra-btn").forEach(btn => btn.disabled = true);
     }
 
-    criarTabuleiro();
+    iniciarJogo();
   </script>
 </body>
 </html>
