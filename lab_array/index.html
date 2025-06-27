@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análise de Produtos</title>
+  <link rel="stylesheet" href="css/estilo.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📦 Análise de Produtos da Loja</h1>
+
+    <input type="text" id="buscar" placeholder="Digite o nome do produto" />
+    <button>Buscar Produto</button>
+    <div id="resultadoBusca" class="card"></div>
+
+    <hr />
+
+    <button onclick="listarProdutos()">📋 Listar Produtos</button>
+    <button onclick="mostrarNomes()">📝 Nomes dos Produtos</button>
+    <button onclick="calcularTotal()">💰 Valor Total do Estoque</button>
+    <button onclick="verificarEsgotados()">🚨 Produtos Esgotados</button>
+    <button onclick="verificarPrecos()">💸 Preços Justos</button>
+
+    <div id="resultado" class="output"></div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
